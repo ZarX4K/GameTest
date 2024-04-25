@@ -87,19 +87,7 @@ public class GameLogic {
             if (ball.dead && ball.timeToAlive < 0) {
                 ball.dead = false;
                 ball.timeToAlive = 2000;
-
-            }
-            for (Rocket rocket : rockets) {
-                rocket.move();
-                if (ball.isCollided(rocket.getRectangle()) && !ball.dead) {
-
-                    System.out.println("Collision");
-                    ball.hit();
-                    ball.dead = true;
-
-                }
-
-            }
+z            }
 
 
         }
@@ -107,6 +95,17 @@ public class GameLogic {
             if (ball.isCollided(wall.getRectangle())) {
                 wall.inactivate();
             }
+        }
+        for (Rocket rocket : rockets) {
+            rocket.move();
+            if (ball.isCollided(rocket.getRectangle()) && !ball.dead) {
+
+                System.out.println("Collision");
+                ball.hit();
+                ball.dead = true;
+
+            }
+
         }
 
     }
