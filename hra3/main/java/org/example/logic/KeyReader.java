@@ -15,6 +15,7 @@ public class KeyReader implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_W) {
             upPressed = true;
+            System.out.println("d");
         } else if (e.getKeyCode() == KeyEvent.VK_S) {
             downPressed = true;
         } else if (e.getKeyCode() == KeyEvent.VK_A) {

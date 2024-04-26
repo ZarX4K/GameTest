@@ -3,6 +3,7 @@ package org.example;
 import org.example.logic.*;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -12,32 +13,52 @@ public class GameLogic {
     public static int width = 1080;
     public static int height = 720;
     private final int ENEMY_STEPS = 5;
-    private final int BALL_STEPS = 10;
+    private final int PLAYER_STEPS = 10;
     private final int ROCKET_VELOCITYY = 3;
     private final int ROCKET_VELOCITYX = 3;
-    private Ball ball;
+    private Player player;
     private final ArrayList<Enemy> enemies;
     private final ArrayList<Wall> walls;
     private final ArrayList<Rocket> rockets;
     private Heartz heartz;
 
 
+    public void handleKeyEvent(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W:
+                movePlayer(Direction.UP);
+                break;
+            case KeyEvent.VK_S:
+                movePlayer(Direction.DOWN);
+                break;
+            case KeyEvent.VK_A:
+                movePlayer(Direction.LEFT);
+                break;
+            case KeyEvent.VK_D:
+                movePlayer(Direction.RIGHT);
+                break;
+            // Add handling for other keys if needed
+        }
+    }
+
+
     public GameLogic() {
-        this.ball = null;
+        this.player = null;
         this.enemies = new ArrayList<>();
         this.walls = new ArrayList<>();
         this.rockets = new ArrayList<>();
+        this.player = null;
 
     }
 
 
     public void initialize() {
 
-        ball = new Ball(500, 500, "Player.png");
+        player = new Player(500, 500, "Player.png");
 
-        //Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
+        Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
         //Wall wall2 = new Wall(100, 50, 150, 50, Color.BLACK);
-        //walls.add(wall1);
+        walls.add(wall1);
       //  walls.add(wall2);
         heartz = new Heartz(980, 1, "Heartz.png");
 
@@ -56,14 +77,14 @@ public class GameLogic {
     public void update() {
 
 
-        //ball.move(2, Direction.RIGHT);
+        //player.move(2, Direction.RIGHT);
         for (Enemy enemy : enemies) {
-            int differenceX = Math.abs(ball.getCoord().x - enemy.getCoord().x);
-            int differenceY = Math.abs(ball.getCoord().y - enemy.getCoord().y);
+            int differenceX = Math.abs(player.getCoord().x - enemy.getCoord().x);
+            int differenceY = Math.abs(player.getCoord().y - enemy.getCoord().y);
 
             if (differenceX > differenceY) {
                 // Direction LEFT, RIGHT
-                if (ball.getCoord().x - enemy.getCoord().x > 0) {
+                if (player.getCoord().x - enemy.getCoord().x > 0) {
                     // Direction RIGHT
                     enemy.move(ENEMY_STEPS, Direction.RIGHT);
                 } else {
@@ -72,7 +93,7 @@ public class GameLogic {
                 }
             } else {
                 // Direction UP, DOWN
-                if (ball.getCoord().y - enemy.getCoord().y > 0) {
+                if (player.getCoord().y - enemy.getCoord().y > 0) {
                     // Direction DOWN
                     enemy.move(ENEMY_STEPS, Direction.DOWN);
                 } else {
@@ -85,25 +106,25 @@ public class GameLogic {
 
         }
         for (Wall wall : walls) {
-            if (ball.isCollided(wall.getRectangle())) {
+            if (player.isCollided(wall.getRectangle())) {
                 wall.inactivate();
             }
         }
         for (Rocket rocket : rockets) {
             rocket.move();
-            if (ball.isCollided(rocket.getRectangle()) && !ball.dead) {
+            if (player.isCollided(rocket.getRectangle()) && !player.dead) {
 
                 System.out.println("Collision");
-                ball.hit();
-                ball.dead = true;
+                player.hit();
+                player.dead = true;
 
-            }if (ball.dead) {
-                ball.timeToAlive -= 20;
-             //   System.out.println("ttl:" + ball.timeToAlive);
+            }if (player.dead) {
+                player.timeToAlive -= 20;
+             //   System.out.println("ttl:" + player.timeToAlive);
             }
-            if (ball.dead && ball.timeToAlive < 0) {
-                ball.dead = false;
-                ball.timeToAlive = 2000;
+            if (player.dead && player.timeToAlive < 0) {
+                player.dead = false;
+                player.timeToAlive = 2000;
             }
 
         }
@@ -161,16 +182,16 @@ public class GameLogic {
         Rectangle moveRectangle = new Rectangle();
         switch (direction) {
             case RIGHT -> {
-                moveRectangle = new Rectangle(ball.getX() + BALL_STEPS, ball.getY(), ball.getWidth(), ball.getHeight());
+                moveRectangle = new Rectangle(player.getX() + PLAYER_STEPS, player.getY(), player.getWidth(), player.getHeight());
             }
             case LEFT -> {
-                moveRectangle = new Rectangle(ball.getX() - BALL_STEPS, ball.getY(), ball.getWidth(), ball.getHeight());
+                moveRectangle = new Rectangle(player.getX() - PLAYER_STEPS, player.getY(), player.getWidth(), player.getHeight());
             }
             case UP -> {
-                moveRectangle = new Rectangle(ball.getX(), ball.getY() - BALL_STEPS, ball.getWidth(), ball.getHeight());
+                moveRectangle = new Rectangle(player.getX(), player.getY() - PLAYER_STEPS, player.getWidth(), player.getHeight());
             }
             case DOWN -> {
-                moveRectangle = new Rectangle(ball.getX(), ball.getY() + BALL_STEPS, ball.getWidth(), ball.getHeight());
+                moveRectangle = new Rectangle(player.getX(), player.getY() + PLAYER_STEPS, player.getWidth(), player.getHeight());
             }
 
         }
@@ -184,6 +205,8 @@ public class GameLogic {
 
     }
 
+
+
     public Heartz getHeartz() {
         return heartz;
     }
@@ -192,9 +215,10 @@ public class GameLogic {
         return enemies;
     }
 
-    public Ball getBall() {
-        return ball;
+    public Player getPlayer() {
+        return player;
     }
+
 
 
     public ArrayList<Wall> getWalls() {
@@ -202,9 +226,10 @@ public class GameLogic {
     }
 
     public void movePlayer(Direction direction) {
-        ball.move(BALL_STEPS, direction);
+        player.move(PLAYER_STEPS, direction);
 
     }
+
 
 
     public ArrayList<Rocket> getRockets() {
