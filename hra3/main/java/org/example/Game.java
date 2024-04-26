@@ -28,19 +28,14 @@ public class Game {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()){
-                    case KeyEvent.VK_A:
-                        controlledMove(Direction.LEFT);
-                        break;
-                    case KeyEvent.VK_D:
+                if (e.getKeyCode() == KeyEvent.VK_W) {
+                    controlledMove(Direction.UP);
+                } else if (e.getKeyCode() == KeyEvent.VK_D) {
                         controlledMove(Direction.RIGHT);
-                        break;
-                    case KeyEvent.VK_W:
-                        controlledMove(Direction.UP);
-                        break;
-                    case KeyEvent.VK_S:
+                } else if (e.getKeyCode() == KeyEvent.VK_A) {
+                        controlledMove(Direction.LEFT);
+                } else if (e.getKeyCode() == KeyEvent.VK_S) {
                         controlledMove(Direction.DOWN);
-                        break;
                 }
 
 

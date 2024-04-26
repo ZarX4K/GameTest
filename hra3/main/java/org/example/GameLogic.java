@@ -35,10 +35,10 @@ public class GameLogic {
 
         ball = new Ball(500, 500, "Player.png");
 
-        Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
-        Wall wall2 = new Wall(100, 50, 150, 50, Color.BLACK);
-        walls.add(wall1);
-        walls.add(wall2);
+        //Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
+        //Wall wall2 = new Wall(100, 50, 150, 50, Color.BLACK);
+        //walls.add(wall1);
+      //  walls.add(wall2);
         heartz = new Heartz(980, 1, "Heartz.png");
 
         spawnRockets();
@@ -80,14 +80,7 @@ public class GameLogic {
                     enemy.move(ENEMY_STEPS, Direction.UP);
                 }
             }
-            if (ball.dead) {
-                ball.timeToAlive -= 20;
-                System.out.println("ttl:" + ball.timeToAlive);
-            }
-            if (ball.dead && ball.timeToAlive < 0) {
-                ball.dead = false;
-                ball.timeToAlive = 2000;
-z            }
+
 
 
         }
@@ -104,6 +97,13 @@ z            }
                 ball.hit();
                 ball.dead = true;
 
+            }if (ball.dead) {
+                ball.timeToAlive -= 20;
+             //   System.out.println("ttl:" + ball.timeToAlive);
+            }
+            if (ball.dead && ball.timeToAlive < 0) {
+                ball.dead = false;
+                ball.timeToAlive = 2000;
             }
 
         }
