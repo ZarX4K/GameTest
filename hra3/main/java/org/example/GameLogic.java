@@ -21,6 +21,10 @@ public class GameLogic {
     private final ArrayList<Wall> walls;
     private final ArrayList<Rocket> rockets;
     private Heartz heartz;
+    private Heartz heartz2;
+    private Heartz heartz3;
+    KeyReader keyReader = new KeyReader();
+
 
 
     public void handleKeyEvent(KeyEvent e) {
@@ -37,7 +41,6 @@ public class GameLogic {
             case KeyEvent.VK_D:
                 movePlayer(Direction.RIGHT);
                 break;
-            // Add handling for other keys if needed
         }
     }
 
@@ -54,14 +57,15 @@ public class GameLogic {
 
     public void initialize() {
 
-        player = new Player(500, 500, "Player.png");
+        player = new Player(500, 500, "Player.png",keyReader);
 
         Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
         //Wall wall2 = new Wall(100, 50, 150, 50, Color.BLACK);
         walls.add(wall1);
       //  walls.add(wall2);
         heartz = new Heartz(980, 1, "Heartz.png");
-
+        heartz2 = new Heartz(980, 1, "HeartHalf.png");
+        heartz3 = new Heartz(980, 1, "HeartLast.png");
         spawnRockets();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -76,7 +80,7 @@ public class GameLogic {
 
     public void update() {
 
-
+        player.update();
         //player.move(2, Direction.RIGHT);
         for (Enemy enemy : enemies) {
             int differenceX = Math.abs(player.getCoord().x - enemy.getCoord().x);
@@ -209,6 +213,12 @@ public class GameLogic {
 
     public Heartz getHeartz() {
         return heartz;
+    }
+    public Heartz getHeartz2() {
+        return heartz2;
+    }
+    public Heartz getHeartz3() {
+        return heartz3;
     }
 
     public ArrayList<Enemy> getEnemy() {

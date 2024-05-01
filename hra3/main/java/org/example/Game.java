@@ -18,7 +18,7 @@ public class Game {
         boolean isGameOver = false;
 
 
-       graphic.addKeyListener(new KeyListener() {
+    /*   graphic.addKeyListener(new KeyListener() {
             public boolean upPressed, downPressed, leftPressed, rightPressed;
 
             @Override
@@ -43,21 +43,6 @@ public class Game {
                         }
                 }
 
-           public boolean isUpPressed() {
-               return upPressed;
-           }
-
-           public boolean isDownPressed() {
-               return downPressed;
-           }
-
-           public boolean isLeftPressed() {
-               return leftPressed;
-           }
-
-           public boolean isRightPressed() {
-               return rightPressed;
-           }
 
            @Override
             public void keyReleased(KeyEvent e) {
@@ -73,7 +58,7 @@ public class Game {
 
 
             }
-        });
+        });*/
 
 
 

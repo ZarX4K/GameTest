@@ -14,13 +14,12 @@ import java.io.IOException;
 import java.net.URL;
 
 public class GameGraphics extends JFrame {
-
+    BufferedImage bi;
     Draw draw;
     GameLogic logic;
     private final Font customFont = new Font("Arial", Font.BOLD, 16);
 
     public GameGraphics(GameLogic logic) throws HeadlessException {
-        BufferedImage bi;
         this.draw = new Draw();
         this.logic = logic;
 
@@ -32,7 +31,7 @@ public class GameGraphics extends JFrame {
         setIconImage(new ImageIcon("src/main/resources/gameLogo.png").getImage());
         add(draw);
         try {
-            bi= ImageIO.read(new File("src/main/resources/BackGrass.png"));
+            bi= ImageIO.read(new File("src/main/resources/backGrGrass.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,8 +45,10 @@ public class GameGraphics extends JFrame {
     }
 
     public class Draw extends JPanel {
+
         @Override
         protected void paintComponent(Graphics g) {
+            g.drawImage(bi,0 ,0,getWidth(),getHeight(),null);
             g.drawImage(logic.getPlayer().getImage(), logic.getPlayer().getX(), logic.getPlayer().getY(), new ImageObserver() {
                 @Override
                 public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
@@ -61,7 +62,12 @@ public class GameGraphics extends JFrame {
                 if (logic.getPlayer().getLives() > 6) {
                     g.drawImage(logic.getHeartz().getImage(), logic.getHeartz().getX(), logic.getHeartz().getY(), null);
                 }
-                // else if (logic.getHeartz().getLives())
+                 else if (logic.getPlayer().getLives() > 3) {
+                    g.drawImage(logic.getHeartz2().getImage(), logic.getHeartz2().getX(), logic.getHeartz2().getY(), null);
+                }
+                else if (logic.getPlayer().getLives() > 0) {
+                    g.drawImage(logic.getHeartz3().getImage(), logic.getHeartz3().getX(), logic.getHeartz3().getY(), null);
+                }
             }
             for (Wall wall : logic.getWalls()) {
                 if (wall.isActive()) {
