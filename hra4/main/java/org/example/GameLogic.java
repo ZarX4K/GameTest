@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.logic.BackGround;
+import org.example.logic.BackGroundStart;
 import org.example.logic.Direction;
 import org.example.logic.Enemy;
 import org.example.logic.Heartz;
@@ -11,6 +12,10 @@ import org.example.logic.Wall;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -34,11 +39,14 @@ public class GameLogic  extends JPanel implements Runnable {
 
     private final int PLAYER_STEPS = 10;
     BackGround backGround;
+    BackGroundStart backGroundStart;
     private final int ROCKET_VELOCITYY = 3;
     private final int ROCKET_VELOCITYX = 3;
     int startCount;
     int spawnRate = 27;
     private final Font customFont = new Font("Arial", Font.BOLD, 16);
+
+    public int gameState = 1;
 
     public GameLogic (){
         this.enemies = new ArrayList<>();
@@ -48,8 +56,10 @@ public class GameLogic  extends JPanel implements Runnable {
         setBackground(Color.black);
         setDoubleBuffered(true);
         backGround = new BackGround(this);
+        backGroundStart = new BackGroundStart(this);
         addKeyListener(keyReader);
         setFocusable(true);
+
 
     }
 
@@ -64,37 +74,67 @@ public class GameLogic  extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        backGround.draw(g);
-        player.draw(g);
-        for (Wall wall : walls) {
-            if (wall.isActive()) {
-                g.setColor(wall.getColor());
-                g.drawLine(wall.getCoordStart().x, wall.getCoordStart().y, wall.getCoordEnd().x, wall.getCoordEnd().y);
+        if(gameState == 2){
+            backGround.draw(g);
+            player.draw(g);
+            for (Wall wall : walls) {
+                if (wall.isActive()) {
+                    g.setColor(wall.getColor());
+                    g.drawLine(wall.getCoordStart().x, wall.getCoordStart().y, wall.getCoordEnd().x, wall.getCoordEnd().y);
+                }
             }
+            for (Rocket rocket : rockets) {
+                g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
+            }
+            g.setFont(customFont);
+            g.drawString("Health: " + player.getLives(), 970, 80);
+            if (player.getLives() > 6) {
+                g.drawImage(heartz.getImage(), heartz.getX(), heartz.getY(), null);
+            }
+            else if (player.getLives() > 3) {
+                g.drawImage(heartz2.getImage(), heartz2.getX(), heartz2.getY(), null);
+            }
+            else if (player.getLives() > 0) {
+                g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
+            }
+        } else {
+            backGroundStart.draw(g);
+            g.setFont(customFont);
+            g.setColor(Color.WHITE);
+            // g.drawString("PRESS ENTER TO START GAME ", 160,400);
+
+            setLayout();
         }
-        for (Rocket rocket : rockets) {
-            g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
-        }
-        g.setFont(customFont);
-        g.drawString("Health: " + player.getLives(), 970, 80);
-        if (player.getLives() > 6) {
-            g.drawImage(heartz.getImage(), heartz.getX(), heartz.getY(), null);
-        }
-        else if (player.getLives() > 3) {
-            g.drawImage(heartz2.getImage(), heartz2.getX(), heartz2.getY(), null);
-        }
-        else if (player.getLives() > 0) {
-            g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
-        }
+
+    }
+
+    public void setLayout(){
+        JButton startButton = new JButton("START");
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+    }
+
+
+
+    public void changeGameState(){
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                gameState = 2; // Start the game when the mouse is clicked
+            }});
     }
 
     public void update() {
-        player.update();
-        for (Wall wall : walls) {
-            if (player.isCollided(wall.getRectangle())) {
-                wall.inactivate();
-            }
-        }
+
+        changeGameState();
+
+        controlledMove();
+
         for (Rocket rocket : rockets) {
             rocket.move();
             if (player.isCollided(rocket.getRectangle()) && !player.dead) {
@@ -115,16 +155,64 @@ public class GameLogic  extends JPanel implements Runnable {
         spawnInterval();
     }
 
+    private void controlledMove() {
+        int newX = player.getX();
+        int newY = player.getY();
+
+        if (keyReader.upPressed) {
+            newY -= player.getSpeed();
+        }
+        if (keyReader.downPressed) {
+            newY += player.getSpeed();
+        }
+        if (keyReader.leftPressed) {
+            newX -= player.getSpeed();
+        }
+        if (keyReader.rightPressed) {
+            newX += player.getSpeed();
+        }
+
+        // Create a rectangle representing the player's new position
+        Rectangle newPlayerRectangle = new Rectangle(newX, newY, player.getWidth(), player.getHeight());
+
+        // Check collision with walls for the new position
+        for (Wall wall : walls) {
+            Rectangle wallRectangle = wall.getRectangle();
+            if (newPlayerRectangle.intersects(wallRectangle)) {
+                // Adjust new position to prevent collision with the wall
+                if (keyReader.upPressed) {
+                    newY = Math.max(newY, wallRectangle.y + wallRectangle.height);
+                }
+                if (keyReader.downPressed) {
+                    newY = Math.min(newY, wallRectangle.y - player.getHeight());
+                }
+                if (keyReader.leftPressed) {
+                    newX = Math.max(newX, wallRectangle.x + wallRectangle.width);
+                }
+                if (keyReader.rightPressed) {
+                    newX = Math.min(newX, wallRectangle.x - player.getWidth());
+                }
+                break; // Exit the loop after handling collision with one wall
+            }
+        }
+
+        // Update player's position
+        player.setX(newX);
+        player.setY(newY);
+    }
+
     private void spawnRocket() {
         Random random = new Random();
         int randCorner;
         randCorner = random.nextInt(5);
+        randCorner = 1;
 
 
         switch (randCorner) {
 
             case 1:
-                rockets.add(new Rocket(0, 0, ROCKET_VELOCITYY, ROCKET_VELOCITYX, "raketa.jpg"));
+                Point point = pointToEnemy(player.x, player.y, 0, 0, 7);
+                rockets.add(new Rocket(0, 0, point.x, point.y, "raketa.jpg"));
                 System.out.println("leva horni strela");
                 break;
 
@@ -142,6 +230,12 @@ public class GameLogic  extends JPanel implements Runnable {
                 break;
 
         }
+    }
+
+    public Point pointToEnemy(int enemyX, int enemyY, int coordX, int coordY, double speed) {
+        double angle = Math.atan2(enemyY - coordX, enemyX - coordY);
+
+        return new Point((int)(speed * Math.cos(angle)), (int)(speed * Math.sin(angle)));
     }
 
     public void spawnInterval(){

@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class KeyReader implements KeyListener {
 
-    public boolean upPressed, downPressed, leftPressed, rightPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, changeState;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -26,7 +26,9 @@ public class KeyReader implements KeyListener {
         else if(e.getKeyCode() == KeyEvent.VK_D){
             rightPressed = true;
         }
-
+        else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+            changeState = true;
+        }
 
     }
 
