@@ -1,8 +1,7 @@
 package org.example;
 
 import org.example.logic.BackGround;
-import org.example.logic.BackGroundStart;
-import org.example.logic.Direction;
+import org.example.logic.StartGamePic;
 import org.example.logic.Enemy;
 import org.example.logic.Heartz;
 import org.example.logic.KeyReader;
@@ -12,10 +11,7 @@ import org.example.logic.Wall;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -29,26 +25,27 @@ public class GameLogic  extends JPanel implements Runnable {
     private Heartz heartz;
     private Heartz heartz2;
     private Heartz heartz3;
+    int secondsPassed;
 
     Thread gamethread;
     long currentTime;
     double delta = 0;
     long lastTime = System.nanoTime();
     int fps = 60;
-    double drawInterval = 1000000000/fps;
+    double drawInterval = 1000000000 / fps;
 
-    private final int PLAYER_STEPS = 10;
     BackGround backGround;
-    BackGroundStart backGroundStart;
+    StartGamePic startGamePic;
     private final int ROCKET_VELOCITYY = 3;
     private final int ROCKET_VELOCITYX = 3;
     int startCount;
     int spawnRate = 27;
     private final Font customFont = new Font("Arial", Font.BOLD, 16);
+    private boolean gameStarted = false;
 
     public int gameState = 1;
 
-    public GameLogic (){
+    public GameLogic() {
         this.enemies = new ArrayList<>();
         this.walls = new ArrayList<>();
         this.rockets = new ArrayList<>();
@@ -56,15 +53,23 @@ public class GameLogic  extends JPanel implements Runnable {
         setBackground(Color.black);
         setDoubleBuffered(true);
         backGround = new BackGround(this);
-        backGroundStart = new BackGroundStart(this);
+        startGamePic = new StartGamePic(this);
         addKeyListener(keyReader);
         setFocusable(true);
-
-
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (!gameStarted) {
+                    gameStarted = true;
+                    startTimer();
+                }
+            }
+        });
     }
 
+
     public void initialize() {
-        Wall wall1 = new Wall(250, 30, 250, 130, Color.BLACK);
+        Wall wall1 = new Wall(250, 30, 250, 500, Color.BLACK);
         walls.add(wall1);
         heartz = new Heartz(980, 1, "Heartz.png");
         heartz2 = new Heartz(980, 1, "HeartHalf.png");
@@ -74,7 +79,7 @@ public class GameLogic  extends JPanel implements Runnable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(gameState == 2){
+        if (gameState == 2) {
             backGround.draw(g);
             player.draw(g);
             for (Wall wall : walls) {
@@ -87,50 +92,53 @@ public class GameLogic  extends JPanel implements Runnable {
                 g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
             }
             g.setFont(customFont);
+            g.drawString("Time Alive: " + getSecondsPassed(), 960, 100);
             g.drawString("Health: " + player.getLives(), 970, 80);
             if (player.getLives() > 6) {
                 g.drawImage(heartz.getImage(), heartz.getX(), heartz.getY(), null);
-            }
-            else if (player.getLives() > 3) {
+            } else if (player.getLives() > 3) {
                 g.drawImage(heartz2.getImage(), heartz2.getX(), heartz2.getY(), null);
-            }
-            else if (player.getLives() > 0) {
+            } else if (player.getLives() > 0) {
                 g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
             }
         } else {
-            backGroundStart.draw(g);
+            startGamePic.draw(g);
             g.setFont(customFont);
             g.setColor(Color.WHITE);
-            // g.drawString("PRESS ENTER TO START GAME ", 160,400);
 
-            setLayout();
+
         }
 
     }
 
-    public void setLayout(){
-        JButton startButton = new JButton("START");
-        startButton.addActionListener(new ActionListener() {
+    private void startTimer() {
+        Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                secondsPassed++;
             }
         });
-
+        timer.start();
     }
 
+    public int getSecondsPassed() {
+        return secondsPassed;
+    }
 
-
-    public void changeGameState(){
+    public void changeGameState() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 gameState = 2; // Start the game when the mouse is clicked
-            }});
+            }
+        });
     }
 
-    public void update() {
+   
 
+
+    public void update() {
+        ArrayList<Rocket> rocketsToRemove = new ArrayList<>();
         changeGameState();
 
         controlledMove();
@@ -141,7 +149,9 @@ public class GameLogic  extends JPanel implements Runnable {
 
                 System.out.println("Collision");
                 player.hit();
+
                 player.dead = true;
+                rocketsToRemove.add(rocket);
 
             }if (player.dead) {
                 player.timeToAlive -= 2;
@@ -152,6 +162,7 @@ public class GameLogic  extends JPanel implements Runnable {
                 player.timeToAlive = 1500;
             }
         }
+        rockets.removeAll(rocketsToRemove);
         spawnInterval();
     }
 
@@ -171,6 +182,27 @@ public class GameLogic  extends JPanel implements Runnable {
         if (keyReader.rightPressed) {
             newX += player.getSpeed();
         }
+        if(keyReader.rightPressed &&keyReader.upPressed){
+            newX += player.getSpeed() - 8;
+            newY -= player.getSpeed() - 8;
+
+        }
+        if(keyReader.leftPressed &&keyReader.upPressed){
+            newX -= player.getSpeed() - 8;
+            newY -= player.getSpeed() - 8;
+
+        }
+        if(keyReader.leftPressed &&keyReader.downPressed){
+            newX -= player.getSpeed() - 8;
+            newY += player.getSpeed() - 8;
+
+        }
+        if(keyReader.rightPressed &&keyReader.downPressed){
+            newX += player.getSpeed() - 8;
+            newY += player.getSpeed() - 8;
+
+        }
+
 
         // Create a rectangle representing the player's new position
         Rectangle newPlayerRectangle = new Rectangle(newX, newY, player.getWidth(), player.getHeight());
@@ -202,40 +234,49 @@ public class GameLogic  extends JPanel implements Runnable {
     }
 
     private void spawnRocket() {
+        Random rando = new Random();
+        int randPick = rando.nextInt(4) + 1;
         Random random = new Random();
-        int randCorner;
-        randCorner = random.nextInt(5);
-        randCorner = 1;
+        for (int i = 0; i < randPick; i++) {
+            int randCorner = random.nextInt(4); // Randomly select a corner
+          //  System.out.println(randCorner);
 
+            Point point = null;
+            switch (randCorner) {
 
-        switch (randCorner) {
+                case 0:
+                   point = pointToEnemy(player.x, player.y, 0, 0, 7);
+                    rockets.add(new Rocket(0, 0, point.x, point.y, "raketa.jpg"));
+                 //   System.out.println("leva horni strela ########");
+                    break;
 
-            case 1:
-                Point point = pointToEnemy(player.x, player.y, 0, 0, 7);
-                rockets.add(new Rocket(0, 0, point.x, point.y, "raketa.jpg"));
-                System.out.println("leva horni strela");
-                break;
+                case 1:
+                   point = pointToEnemy(player.x, player.y, 1080, 0, 7);
+                   System.out.println(point);
+                    rockets.add(new Rocket(1080, 0, point.x, point.y, "raketa.jpg"));
+                   // System.out.println("prava horni strela ");
+                    break;
+                case 2:
+                    point = pointToEnemy(player.x, player.y, 0, 720, 7);
+                    System.out.println(point);
+                    rockets.add(new Rocket(0, 720, point.x, point.y, "raketa.jpg"));
+                    System.out.println("leva dolni strela");
+                    break;
+                case 3:
+                   point= pointToEnemy(player.x, player.y, 1080, 720, 7);
+                    System.out.println(point);
+                    rockets.add(new Rocket(1080, 720, point.x, point.y, "raketa.jpg"));
+                  //  System.out.println("prava dolni strela");
+                    break;
 
-            case 2:
-                rockets.add(new Rocket(1080, 0, -ROCKET_VELOCITYY, ROCKET_VELOCITYX, "raketa.jpg"));
-                System.out.println("prava horni strela ");
-                break;
-            case 3:
-                rockets.add(new Rocket(0, 720, ROCKET_VELOCITYY, -ROCKET_VELOCITYX, "raketa.jpg"));
-                System.out.println("leva dolni strela");
-                break;
-            case 4:
-                rockets.add(new Rocket(1080, 720, -ROCKET_VELOCITYY, -ROCKET_VELOCITYX, "raketa.jpg"));
-                System.out.println("prava dolni strela");
-                break;
-
+            }
         }
     }
 
     public Point pointToEnemy(int enemyX, int enemyY, int coordX, int coordY, double speed) {
-        double angle = Math.atan2(enemyY - coordX, enemyX - coordY);
+        double angle = Math.atan2(enemyY - coordY, enemyX - coordX);
 
-        return new Point((int)(speed * Math.cos(angle)), (int)(speed * Math.sin(angle)));
+        return new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle)));
     }
 
     public void spawnInterval(){

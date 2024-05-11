@@ -27,7 +27,7 @@ public class KeyReader implements KeyListener {
             rightPressed = true;
         }
         else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-            changeState = true;
+            System.out.println("lalala");
         }
 
     }

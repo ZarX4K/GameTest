@@ -29,40 +29,7 @@ public class Player { //extends Entity {
         this.lives = 10;
     }
 
-    public void update(){
-        if(keyReader.upPressed == true) {
-            y -= speed;
-        }
-        if(keyReader.downPressed == true) {
-            y += speed;
-        }
-        if(keyReader.leftPressed == true){
-            x -= speed;
-        }
-        if(keyReader.rightPressed == true){
-            x += speed;
-        }
-        if(keyReader.rightPressed &&keyReader.upPressed){
-            x += speed - 8;
-            y -= speed - 8;
 
-        }
-        if(keyReader.leftPressed &&keyReader.upPressed){
-            x -= speed - 8;
-            y -= speed - 8;
-
-        }
-        if(keyReader.leftPressed &&keyReader.downPressed){
-            x -= speed - 8;
-            y += speed - 8;
-
-        }
-        if(keyReader.rightPressed &&keyReader.downPressed){
-            x += speed - 8;
-            y += speed - 8;
-
-        }
-    }
 
     public void draw (Graphics g){
         g.drawImage(image, x, y, width, height, null);
