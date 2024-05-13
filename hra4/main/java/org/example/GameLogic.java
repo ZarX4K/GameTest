@@ -1,13 +1,6 @@
 package org.example;
 
-import org.example.logic.BackGround;
-import org.example.logic.StartGamePic;
-import org.example.logic.Enemy;
-import org.example.logic.Heartz;
-import org.example.logic.KeyReader;
-import org.example.logic.Player;
-import org.example.logic.Rocket;
-import org.example.logic.Wall;
+import org.example.logic.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,8 +29,7 @@ public class GameLogic  extends JPanel implements Runnable {
 
     BackGround backGround;
     StartGamePic startGamePic;
-    private final int ROCKET_VELOCITYY = 3;
-    private final int ROCKET_VELOCITYX = 3;
+    EndGamePic endGamePic;
     int startCount;
     int spawnRate = 27;
     private final Font customFont = new Font("Arial", Font.BOLD, 16);
@@ -54,6 +46,8 @@ public class GameLogic  extends JPanel implements Runnable {
         setDoubleBuffered(true);
         backGround = new BackGround(this);
         startGamePic = new StartGamePic(this);
+        endGamePic = new EndGamePic(this);
+
         addKeyListener(keyReader);
         setFocusable(true);
         addMouseListener(new MouseAdapter() {
@@ -101,12 +95,16 @@ public class GameLogic  extends JPanel implements Runnable {
             } else if (player.getLives() > 0) {
                 g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
             }
-        } else {
+        }
+        if (gameState == 1) {
             startGamePic.draw(g);
             g.setFont(customFont);
             g.setColor(Color.WHITE);
 
 
+        }
+        if (gameState == 3) {
+            endGamePic.draw(g);
         }
 
     }
@@ -134,8 +132,6 @@ public class GameLogic  extends JPanel implements Runnable {
         });
     }
 
-   
-
 
     public void update() {
         ArrayList<Rocket> rocketsToRemove = new ArrayList<>();
@@ -153,7 +149,8 @@ public class GameLogic  extends JPanel implements Runnable {
                 player.dead = true;
                 rocketsToRemove.add(rocket);
 
-            }if (player.dead) {
+            }
+            if (player.dead) {
                 player.timeToAlive -= 2;
                 //   System.out.println("ttl:" + player.timeToAlive);
             }
@@ -182,22 +179,22 @@ public class GameLogic  extends JPanel implements Runnable {
         if (keyReader.rightPressed) {
             newX += player.getSpeed();
         }
-        if(keyReader.rightPressed &&keyReader.upPressed){
+        if (keyReader.rightPressed && keyReader.upPressed) {
             newX += player.getSpeed() - 8;
             newY -= player.getSpeed() - 8;
 
         }
-        if(keyReader.leftPressed &&keyReader.upPressed){
+        if (keyReader.leftPressed && keyReader.upPressed) {
             newX -= player.getSpeed() - 8;
             newY -= player.getSpeed() - 8;
 
         }
-        if(keyReader.leftPressed &&keyReader.downPressed){
+        if (keyReader.leftPressed && keyReader.downPressed) {
             newX -= player.getSpeed() - 8;
             newY += player.getSpeed() - 8;
 
         }
-        if(keyReader.rightPressed &&keyReader.downPressed){
+        if (keyReader.rightPressed && keyReader.downPressed) {
             newX += player.getSpeed() - 8;
             newY += player.getSpeed() - 8;
 
@@ -238,35 +235,32 @@ public class GameLogic  extends JPanel implements Runnable {
         int randPick = rando.nextInt(4) + 1;
         Random random = new Random();
         for (int i = 0; i < randPick; i++) {
-            int randCorner = random.nextInt(4); // Randomly select a corner
-          //  System.out.println(randCorner);
+            int randCorner = random.nextInt(4);
+            //  System.out.println(randCorner);
 
             Point point = null;
             switch (randCorner) {
 
                 case 0:
-                   point = pointToEnemy(player.x, player.y, 0, 0, 7);
+                    point = pointToEnemy(player.x, player.y, 0, 0, 7);
                     rockets.add(new Rocket(0, 0, point.x, point.y, "raketa.jpg"));
-                 //   System.out.println("leva horni strela ########");
+                    //   System.out.println("leva horni strela ########");
                     break;
 
                 case 1:
-                   point = pointToEnemy(player.x, player.y, 1080, 0, 7);
-                   System.out.println(point);
+                    point = pointToEnemy(player.x, player.y, 1080, 0, 7);
                     rockets.add(new Rocket(1080, 0, point.x, point.y, "raketa.jpg"));
-                   // System.out.println("prava horni strela ");
+                    // System.out.println("prava horni strela ");
                     break;
                 case 2:
                     point = pointToEnemy(player.x, player.y, 0, 720, 7);
-                    System.out.println(point);
                     rockets.add(new Rocket(0, 720, point.x, point.y, "raketa.jpg"));
-                    System.out.println("leva dolni strela");
+                    //System.out.println("leva dolni strela");
                     break;
                 case 3:
-                   point= pointToEnemy(player.x, player.y, 1080, 720, 7);
-                    System.out.println(point);
+                    point = pointToEnemy(player.x, player.y, 1080, 720, 7);
                     rockets.add(new Rocket(1080, 720, point.x, point.y, "raketa.jpg"));
-                  //  System.out.println("prava dolni strela");
+                    //  System.out.println("prava dolni strela");
                     break;
 
             }
@@ -279,32 +273,42 @@ public class GameLogic  extends JPanel implements Runnable {
         return new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle)));
     }
 
-    public void spawnInterval(){
-        startCount ++;
-        if(startCount == spawnRate){
+    public void spawnInterval() {
+        startCount++;
+        if (startCount == spawnRate) {
             spawnRocket();
             startCount = 0;
         }
     }
 
-    public void startGameThread(){
+    public void startGameThread() {
+        gamethread = new Thread(this);
+        gamethread.start();
+    }
+
+    public void endGameThread() {
         gamethread = new Thread(this);
         gamethread.start();
     }
 
     @Override
     public void run() {
-        while (gamethread != null){
-            currentTime = System.nanoTime();
 
-            delta += (currentTime - lastTime)/drawInterval;
-            lastTime = currentTime;
+        while (gamethread != null) {
+            if (player.getLives() == 0) {
+                gameState = 3;
+            }
+                currentTime = System.nanoTime();
 
-            if(delta >= 1){
-                update();
-                repaint();
-                delta--;
+                delta += (currentTime - lastTime) / drawInterval;
+                lastTime = currentTime;
+
+                if (delta >= 1) {
+                    update();
+                    repaint();
+                    delta--;
+                }
             }
         }
     }
-}
+
