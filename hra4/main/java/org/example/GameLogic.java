@@ -258,7 +258,9 @@ public class GameLogic extends JPanel implements Runnable {
 
             }
         }
+
     }
+
 
     public Point pointToEnemy(int enemyX, int enemyY, int coordX, int coordY, double speed) {
         double angle = Math.atan2(enemyY - coordY, enemyX - coordX);
