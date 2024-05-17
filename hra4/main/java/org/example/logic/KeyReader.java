@@ -1,9 +1,12 @@
 package org.example.logic;
 
+import org.example.GameLogic;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyReader implements KeyListener {
+    GameLogic gameLogic;
 
     public boolean upPressed, downPressed, leftPressed, rightPressed, changeState;
 
@@ -27,6 +30,7 @@ public class KeyReader implements KeyListener {
             rightPressed = true;
         }
         else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+
             System.out.println("lalala");
         }
 

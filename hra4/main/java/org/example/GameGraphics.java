@@ -13,8 +13,6 @@ public class GameGraphics extends JFrame {
         gameLogic.initialize();
         add(gameLogic);
         gameLogic.startGameThread();
-        gameLogic.endGameThread();
-
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
