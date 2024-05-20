@@ -21,7 +21,7 @@ public class BackGround {
 
     public void getImage(){
         try {
-            image = ImageIO.read(new File("src/main/resources/backGrGrass.png"));;
+            image = ImageIO.read(new File("src/main/resources/BackGrGrass.png"));;
 
         }catch (IOException e){
             e.printStackTrace();

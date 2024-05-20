@@ -18,7 +18,7 @@ public class GameLogic extends JPanel implements Runnable {
     public int width = 1080, height = 720;
     public int gameState = 1;
     KeyReader keyReader = new KeyReader();
-    Player player = new Player(this, keyReader, 500, 500, "Player.png");
+    Player player = new Player(this, keyReader, 500, 500, "Player.gif");
     int secondsPassed;
     Thread gamethread;
     long currentTime;
@@ -69,11 +69,11 @@ public class GameLogic extends JPanel implements Runnable {
 
 
     public void initialize() {
-        Wall wall1 = new Wall(250, 30, 250, 500, Color.BLACK);
+        Wall wall1 = new Wall(250, 30, 250, 500, "WallUp.png");
         walls.add(wall1);
         heartz = new Heartz(980, 1, "Heartz.png");
-        heartz2 = new Heartz(980, 1, "HeartHalf.png");
-        heartz3 = new Heartz(980, 1, "HeartLast.png");
+        heartz2 = new Heartz(980, 1, "Heartz2.png");
+        heartz3 = new Heartz(980, 1, "Heartz3.png");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class GameLogic extends JPanel implements Runnable {
             player.draw(g);
             for (Wall wall : walls) {
                 if (wall.isActive()) {
-                    g.setColor(wall.getColor());
+                    wall.draw(g);
                     g.drawLine(wall.getCoordStart().x, wall.getCoordStart().y, wall.getCoordEnd().x, wall.getCoordEnd().y);
                 }
             }
@@ -239,21 +239,21 @@ public class GameLogic extends JPanel implements Runnable {
             switch (randCorner) {
 
                 case 0:
-                    point = pointToEnemy(player.x, player.y, 0, 0, 7);
-                    rockets.add(new Rocket(0, 0, point.x, point.y, "raketa.jpg"));
+                    point = pointToEnemy(player.x, player.y, 0, 0, 6);
+                    rockets.add(new Rocket(0, 0, point.x, point.y, "Bullet.png"));
                     break;
 
                 case 1:
-                    point = pointToEnemy(player.x, player.y, 1080, 0, 7);
-                    rockets.add(new Rocket(1080, 0, point.x, point.y, "raketa.jpg"));
+                    point = pointToEnemy(player.x, player.y, 1080, 0, 6);
+                    rockets.add(new Rocket(1080, 0, point.x, point.y, "Bullet.png"));
                     break;
                 case 2:
-                    point = pointToEnemy(player.x, player.y, 0, 720, 7);
-                    rockets.add(new Rocket(0, 720, point.x, point.y, "raketa.jpg"));
+                    point = pointToEnemy(player.x, player.y, 0, 720, 6);
+                    rockets.add(new Rocket(0, 720, point.x, point.y, "Bullet.png"));
                     break;
                 case 3:
-                    point = pointToEnemy(player.x, player.y, 1080, 720, 7);
-                    rockets.add(new Rocket(1080, 720, point.x, point.y, "raketa.jpg"));
+                    point = pointToEnemy(player.x, player.y, 1080, 720, 6);
+                    rockets.add(new Rocket(1080, 720, point.x, point.y, "Bullet.png"));
                     break;
 
             }
@@ -303,7 +303,7 @@ public class GameLogic extends JPanel implements Runnable {
     public void resetGame() {
         gameState = 1; // Set to initial game state
         gameStarted = false; // Reset the game started flag
-        player = new Player(this, keyReader, 500, 500, "Player.png"); // Recreate the player
+        player = new Player(this, keyReader, 500, 500, "PlayerIdle1.png"); // Recreate the player
         enemies.clear(); // Clear enemies
         walls.clear(); // Clear walls
         rockets.clear(); // Clear rockets
