@@ -12,42 +12,42 @@ public class GameLogic extends JPanel implements Runnable {
     private final ArrayList<Enemy> enemies;
     private final ArrayList<Wall> walls;
     private final ArrayList<Rocket> rockets;
-    private final int ROCKET_VELOCITYY = 3;
-    private final int ROCKET_VELOCITYX = 3;
-    private final Font customFont = new Font("Arial", Font.BOLD, 16);
-    public int width = 1080, height = 720;
-    public int gameState = 1;
-    KeyReader keyReader = new KeyReader();
-    Player player = new Player(this, keyReader, 500, 500, "Player.gif");
-    int secondsPassed;
-    Thread gamethread;
-    long currentTime;
-    double delta = 0;
-    long lastTime = System.nanoTime();
-    int fps = 60;
-    double drawInterval = 1000000000 / fps;
-    BackGround backGround;
-    StartGamePic startGamePic;
-    EndGamePic endGamePic;
-    int startCount;
-    int spawnRate = 27;
     private Heartz heartz;
     private Heartz heartz2;
     private Heartz heartz3;
+    BackGround backGround;
+    StartGamePic startGamePic;
+    EndGamePic endGamePic;
+    KeyReader keyReader = new KeyReader();
+    private final Font customFont = new Font("Arial", Font.BOLD, 16);
+    public int gameState = 1;
     private boolean gameStarted = false;
+    Thread gamethread;
+    long currentTime;
+    double delta = 0;
+    int fps = 60;
+    long lastTime = System.nanoTime();
+    double drawInterval = 1000000000 / fps;
+    public int width = 1080, height = 720;
+    int secondsPassed;
+    int startCount;
+    int spawnRate = 27;
+    Player player = new Player(this, keyReader, 500, 500, "Player.gif");
+
+
 
     public GameLogic() {
         this.enemies = new ArrayList<>();
         this.walls = new ArrayList<>();
         this.rockets = new ArrayList<>();
+        backGround = new BackGround(this);
+        startGamePic = new StartGamePic(this);
+        endGamePic = new EndGamePic(this);
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.black);
         setDoubleBuffered(true);
-        backGround = new BackGround(this);
-        startGamePic = new StartGamePic(this);
-        endGamePic = new EndGamePic(this); // Initialize endGamePic here
-        addKeyListener(keyReader);
         setFocusable(true);
+        addKeyListener(keyReader);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -69,9 +69,9 @@ public class GameLogic extends JPanel implements Runnable {
 
 
     public void initialize() {
-        Wall wall1 = new Wall(250, 30, 250, 500, "WallUp.png");
+        Wall wall1 = new Wall(400, 400,  "WallUp.png");
         walls.add(wall1);
-        heartz = new Heartz(980, 1, "Heartz.png");
+        heartz = new Heartz(980, 1,  "Heartz.png");
         heartz2 = new Heartz(980, 1, "Heartz2.png");
         heartz3 = new Heartz(980, 1, "Heartz3.png");
     }
@@ -83,10 +83,9 @@ public class GameLogic extends JPanel implements Runnable {
             backGround.draw(g);
             player.draw(g);
             for (Wall wall : walls) {
-                if (wall.isActive()) {
-                    wall.draw(g);
-                    g.drawLine(wall.getCoordStart().x, wall.getCoordStart().y, wall.getCoordEnd().x, wall.getCoordEnd().y);
-                }
+  //              if (wall.isActive()) {
+                    g.drawImage(wall.getImage(),wall.getX(),wall.getY(),this);
+ //               }
             }
             for (Rocket rocket : rockets) {
                 g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
@@ -144,7 +143,7 @@ public class GameLogic extends JPanel implements Runnable {
             rocket.move();
             if (player.isCollided(rocket.getRectangle()) && !player.dead) {
 
-                System.out.println("Collision");
+                System.out.println("Collision##############");
                 player.hit();
 
                 player.dead = true;
@@ -207,18 +206,17 @@ public class GameLogic extends JPanel implements Runnable {
             if (newPlayerRectangle.intersects(wallRectangle)) {
                 // Adjust new position to prevent collision with the wall
                 if (keyReader.upPressed) {
-                    newY = Math.max(newY, wallRectangle.y + wallRectangle.height);
+                    newY = Math.max(newY, wall.getY() + wall.getHeight());
                 }
                 if (keyReader.downPressed) {
-                    newY = Math.min(newY, wallRectangle.y - player.getHeight());
+                    newY = Math.min(newY, wall.getY() - player.getHeight());
                 }
                 if (keyReader.leftPressed) {
-                    newX = Math.max(newX, wallRectangle.x + wallRectangle.width);
+                    newX = Math.max(newX, wall.getX() + wall.getWidth());
                 }
                 if (keyReader.rightPressed) {
-                    newX = Math.min(newX, wallRectangle.x - player.getWidth());
+                    newX = Math.min(newX, wall.getX() - player.getWidth());
                 }
-                break; // Exit the loop after handling collision with one wall
             }
         }
 
@@ -258,7 +256,6 @@ public class GameLogic extends JPanel implements Runnable {
 
             }
         }
-
     }
 
 
@@ -295,15 +292,13 @@ public class GameLogic extends JPanel implements Runnable {
                 repaint();
                 delta--;
             }
-
         }
-
     }
 
     public void resetGame() {
         gameState = 1; // Set to initial game state
         gameStarted = false; // Reset the game started flag
-        player = new Player(this, keyReader, 500, 500, "PlayerIdle1.png"); // Recreate the player
+        player = new Player(this, keyReader, 500, 500, "Player.gif"); // Recreate the player
         enemies.clear(); // Clear enemies
         walls.clear(); // Clear walls
         rockets.clear(); // Clear rockets
@@ -312,5 +307,4 @@ public class GameLogic extends JPanel implements Runnable {
         initialize(); // Reinitialize game objects
         repaint(); // Repaint the game screen
     }
-
 }

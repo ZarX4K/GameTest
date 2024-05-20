@@ -6,18 +6,17 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Player { //extends Entity {
+    GameLogic gamePanel;
+    KeyReader keyReader;
+    public int x;
+    public int   y;
     public boolean dead = false;
     public int timeToAlive = 2000;
-   ;
     private int lives;
     public int width = 64;
     public int height = 64;
     public int speed = 6;
-    public int x;
-    public int   y;
     public Image image;
-    GameLogic gamePanel;
-    KeyReader keyReader;
 
     public Player(GameLogic  gamePanel, KeyReader keyReader, int x, int y, String url){
         this.gamePanel = gamePanel;
