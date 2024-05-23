@@ -20,36 +20,13 @@ public class Entity {
 
     }
 
-    public void move(int steps, Direction direction) {
-        switch (direction) {
-            case LEFT -> {
-                this.coord.x -= steps;
-            }
-            case RIGHT -> {
-                this.coord.x += steps;
-            }
-            case UP -> {
-                this.coord.y -= steps;
-            }
-            case DOWN -> {
-                this.coord.y += steps;
-            }
-        }
-    }
+
     public Rectangle getRectangle(){
         return new Rectangle(coord.x,coord.y,width, height);
     }
 
     public Coordinates getCoord() {
         return coord;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public Image getImage() {

@@ -7,7 +7,7 @@ public class GameGraphics extends JFrame {
         setTitle("Survive Until The End");
         setSize(1080, 720);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(true);
+        setResizable(false);
         setIconImage(new ImageIcon("src/main/resources/gameLogo.png").getImage());
         GameLogic  gameLogic = new GameLogic ();
         gameLogic.initialize();

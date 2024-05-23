@@ -10,17 +10,15 @@ public class Player {
     KeyReader keyReader;
     public int x;
     public int y;
-    public boolean dead = false;
-    public int timeToAlive = 2000;
     private int lives;
     public int width = 64;
     public int height = 64;
-    public int speed = 6;
+    public int speed = 8;
     public Image image;
     public Image hitImage;
 
     private long lastHitTime;
-    private final long hitDelay = 1000; // 1 second delay
+    private final long hitDelay = 1000;
 
     public Player(GameLogic gamePanel, KeyReader keyReader, int x, int y, String url, String hitUrl) {
         this.gamePanel = gamePanel;
@@ -28,8 +26,8 @@ public class Player {
         this.x = x;
         this.y = y;
         this.image = new ImageIcon(getClass().getResource("/" + url)).getImage();
-        this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage(); // Correctly load hit image
-        this.lives = 110;
+        this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage();
+        this.lives = 10;
     }
 
     public void draw(Graphics g) {

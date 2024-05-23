@@ -5,57 +5,58 @@ import java.awt.*;
 
 public class Wall {
     private boolean active;
-    public Image image;
+    private boolean flashing;
     public int x;
-    public int   y;
-    public int width = 64;
-    public int height = 64;
-   
+    public int y;
+    public int width = 100;
+    public int height = 100;
+    private long activationTime;
+    private long flashStartTime;
+    public Image flashImage;
+    public Image image;
 
-    public Wall(int x, int y, String url) {
+    public Wall(int x, int y, String url, String flashUrl) {
         this.x = x;
         this.y = y;
-        ImageIcon ii = new ImageIcon(getClass().getResource("/" + url));
-        this.image = ii.getImage();
+        this.image = new ImageIcon(getClass().getResource("/" + url)).getImage();
+        this.flashImage = new ImageIcon(getClass().getResource("/" + flashUrl)).getImage();
+        this.active = false;
+        this.flashing = false;
     }
 
+    public void setActivationTime(long activationTime) {
+        this.activationTime = activationTime;
+    }
 
-
- 
-
-    public void inactivate() {
-        this.active = false;
+    public void activate(long currentTime) {
+        if (!active && !flashing && currentTime >= activationTime) {
+            this.flashing = true;
+            this.flashStartTime = currentTime;
+        }
+        if (flashing && (currentTime - flashStartTime) >= 3) {
+            this.flashing = false;
+            this.active = true;
+        }
     }
 
     public boolean isActive() {
         return active;
     }
-    public void draw (Graphics g){
-        g.drawImage(image, x, y, width, height, null);
+
+    public boolean isFlashing() {
+        return flashing;
     }
 
-    public int getX() {
-        return x;
+    public void draw(Graphics g) {
+        if (flashing) {
+            g.drawImage(flashImage, x, y, width, height, null);
+        } else if (active) {
+            g.drawImage(image, x, y, width, height, null);
+        }
     }
 
-
-    public int getY() {
-        return y;
-    }
-
-
-    public int getWidth() {
-        return width;
-    }
-
-
-    public int getHeight() {
-        return height;
-    }
-    
-
-    public Rectangle getRectangle(){
-        return new Rectangle(x,y,width, height);
+    public Rectangle getRectangle() {
+        return new Rectangle(x, y, width, height);
     }
 
     public Image getImage() {

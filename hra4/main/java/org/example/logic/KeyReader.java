@@ -6,9 +6,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyReader implements KeyListener {
-    GameLogic gameLogic;
 
-    public boolean upPressed, downPressed, leftPressed, rightPressed, changeState;
+    public boolean upPressed, downPressed, leftPressed, rightPressed;
 
     @Override
     public void keyTyped(KeyEvent e) {

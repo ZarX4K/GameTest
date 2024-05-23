@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameLogic extends JPanel implements Runnable {
-    private final ArrayList<Enemy> enemies;
     private final ArrayList<Wall> walls;
     private final ArrayList<Bullet> bullets;
     private Heartz heartz;
@@ -33,11 +32,12 @@ public class GameLogic extends JPanel implements Runnable {
     int startCount;
     int spawnRate = 27;
     Timer timer;
-    Player player = new Player(this, keyReader, 500, 500, "Player.gif", "PlayerHit.gif");
-
+    Player player = new Player(this, keyReader, 200, 200, "Player.gif", "PlayerHit.gif");
+    private Image DarknessImage;
+    private int darknessWidth;
+    private int darknessHeight;
 
     public GameLogic() {
-        this.enemies = new ArrayList<>();
         this.walls = new ArrayList<>();
         this.bullets = new ArrayList<>();
         backGround = new BackGround(this);
@@ -54,6 +54,7 @@ public class GameLogic extends JPanel implements Runnable {
                 if (!gameStarted) {
                     gameStarted = true;
                     startTimer();
+                    gameState = 2;
                 }
             }
         });
@@ -67,16 +68,31 @@ public class GameLogic extends JPanel implements Runnable {
         });
     }
 
-
     public void initialize() {
-        Wall wall1 = new Wall(400, 400,  "WallUp.png");
-        Wall wall2 = new Wall(550, 450,  "WallVer.png");
-        walls.add(wall1);
-        walls.add(wall2);
-        heartz = new Heartz(980, 1,  "Heartz.png");
+        createMaze();
+        wallActivation();
+        heartz = new Heartz(980, 1, "Heartz.png");
         heartz2 = new Heartz(980, 1, "Heartz2.png");
         heartz3 = new Heartz(980, 1, "Heartz3.png");
     }
+    private void createMaze() {
+        walls.add(new Wall(135, 51, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(600, 90, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(673, 523, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(843, 10, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(80, 423, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(984, 586, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(380, 236, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(864, 321, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(300, 521, "Rock.gif", "RockFlash.gif"));
+    }
+private void wallActivation(){
+     int activationTime = 60;
+    for (Wall wall : walls) {
+        wall.setActivationTime(activationTime);
+        activationTime += 1;
+    }
+}
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -85,12 +101,10 @@ public class GameLogic extends JPanel implements Runnable {
             backGround.draw(g);
             player.draw(g);
             for (Wall wall : walls) {
- //              if (wall.isActive()) {
-                g.drawImage(wall.getImage(),wall.getX(),wall.getY(),this);
- //                      }
+                wall.draw(g);
             }
-            for (Bullet rocket : bullets) {
-                g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
+            for (Bullet bullet : bullets) {
+                g.drawImage(bullet.getImage(), bullet.getCoord().x, bullet.getCoord().y, this);
             }
             g.setFont(customFont);
             g.setColor(Color.WHITE);
@@ -103,6 +117,18 @@ public class GameLogic extends JPanel implements Runnable {
             } else if (player.getLives() > 0) {
                 g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
             }
+            if (secondsPassed > 120) {
+
+                DarknessImage = new ImageIcon(getClass().getResource("/Darkness.png")).getImage();
+                darknessWidth = DarknessImage.getWidth(null);
+                darknessHeight = DarknessImage.getHeight(null);
+                int darknessX = player.getX() + player.getWidth() / 2 - darknessWidth / 2;
+                int darknessY = player.getY() + player.getHeight() / 2 - darknessHeight / 2;
+                g.drawImage(DarknessImage, darknessX, darknessY, this);
+
+
+            }
+
         } else if (gameState == 3) {
             endGamePic.draw(g);
         } else {
@@ -115,6 +141,9 @@ public class GameLogic extends JPanel implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 secondsPassed++;
+                for (Wall wall : walls) {
+                    wall.activate(secondsPassed);
+                }
             }
         });
         timer.start();
@@ -130,24 +159,19 @@ public class GameLogic extends JPanel implements Runnable {
         return secondsPassed;
     }
 
-    public void changeGameState() {
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                gameState = 2;
-            }
-        });
-    }
-
 
     public void update() {
+        if (!gameStarted) {
+            return;
+        }
+
         ArrayList<Bullet> rocketsToRemove = new ArrayList<>();
-        changeGameState();
         controlledMove();
         for (Bullet bullet : bullets) {
             bullet.move();
             if (player.isCollided(bullet.getRectangle()) && player.canBeHit()) {
                 player.hit();
+                System.out.println("Collision");
                 rocketsToRemove.add(bullet);
             }
         }
@@ -156,74 +180,58 @@ public class GameLogic extends JPanel implements Runnable {
         if (player.getLives() <= 0) {
             gameState = 3;
         }
-        repaint(); // premaluje hrace
+        repaint();
     }
 
     private void controlledMove() {
-        int newX = player.getX(); // Nová pozice X hráče
-        int newY = player.getY(); // Nová pozice Y hráče
+        int newX = player.getX();
+        int newY = player.getY();
 
-        if (keyReader.upPressed) newY -= player.getSpeed(); // Pokud je stisknuta klávesa nahoru, posune hráče nahoru
-        if (keyReader.downPressed) newY += player.getSpeed(); // Pokud je stisknuta klávesa dolů, posune hráče dolů
-        if (keyReader.leftPressed) newX -= player.getSpeed(); // Pokud je stisknuta klávesa doleva, posune hráče doleva
-        if (keyReader.rightPressed) newX += player.getSpeed(); // Pokud je stisknuta klávesa doprava, posune hráče doprava
+        if (keyReader.upPressed) newY -= player.getSpeed();
+        if (keyReader.downPressed) newY += player.getSpeed();
+        if (keyReader.leftPressed) newX -= player.getSpeed();
+        if (keyReader.rightPressed) newX += player.getSpeed();
 
         if (keyReader.rightPressed && keyReader.upPressed) {
-            newX += player.getSpeed() - 8; // Posune hráče doprava
-            newY -= player.getSpeed() - 8; // Posune hráče nahoru
+            newX += player.getSpeed() - 10;
+            newY -= player.getSpeed() - 10;
         }
         if (keyReader.leftPressed && keyReader.upPressed) {
-            newX -= player.getSpeed() - 8; // Posune hráče doleva
-            newY -= player.getSpeed() - 8; // Posune hráče nahoru
+            newX -= player.getSpeed() - 10;
+            newY -= player.getSpeed() - 10;
         }
         if (keyReader.leftPressed && keyReader.downPressed) {
-            newX -= player.getSpeed() - 8; // Posune hráče doleva
-            newY += player.getSpeed() - 8; // Posune hráče dolů
+            newX -= player.getSpeed() - 10;
+            newY += player.getSpeed() - 10;
         }
         if (keyReader.rightPressed && keyReader.downPressed) {
-            newX += player.getSpeed() - 8; // Posune hráče doprava
-            newY += player.getSpeed() - 8; // Posune hráče dolů
+            newX += player.getSpeed() - 10;
+            newY += player.getSpeed() - 10;
         }
 
-        Rectangle newPlayerRectangle = new Rectangle(newX, newY, player.getWidth(), player.getHeight());
-
-        for (Wall wall : walls) { // Pro každou zeď ve seznamu zdí
-            Rectangle wallRectangle = wall.getRectangle(); // Získá obdélník zdi
-
-            // Kontroluje horizontální kolize
-            if (newPlayerRectangle.intersects(wallRectangle)) { // Pokud se nový obdélník hráče protíná s obdélníkem zdi
-                if (keyReader.leftPressed || keyReader.rightPressed) { // Pokud je stisknuta klávesa doleva nebo doprava
-                    if (keyReader.leftPressed) { // Pokud je stisknuta klávesa doleva
-                        newX = Math.max(newX, wall.getX() + wall.getWidth()); // Nové X bude maximem z aktuálního X a X pozice zdi + její šířka
-                    }
-                    if (keyReader.rightPressed) { // Pokud je stisknuta klávesa doprava
-                        newX = Math.min(newX, wall.getX() - player.getWidth()); // Nové X bude minimem z aktuálního X a X pozice zdi - šířka hráče
-                    }
-                }
-
-                // Aktualizuje pozici hráče po horizontální úpravě
-                newPlayerRectangle.setLocation(newX, player.getY());
-            }
-
-            // Kontroluje vertikální kolize
-            if (newPlayerRectangle.intersects(wallRectangle)) { // Pokud se nový obdélník hráče protíná s obdélníkem zdi
-                if (keyReader.upPressed || keyReader.downPressed) { // Pokud je stisknuta klávesa nahoru nebo dolů
-                    if (keyReader.upPressed) { // Pokud je stisknuta klávesa nahoru
-                        newY = Math.max(newY, wall.getY() + wall.getHeight()); // Nové Y bude maximem z aktuálního Y a Y pozice zdi + její výška
-                    }
-                    if (keyReader.downPressed) { // Pokud je stisknuta klávesa dolů
-                        newY = Math.min(newY, wall.getY() - player.getHeight()); // Nové Y bude minimem z aktuálního Y a Y pozice zdi - výška hráče
-                    }
-                }
-
-                // Aktualizuje pozici hráče po vertikální úpravě
-                newPlayerRectangle.setLocation(player.getX(), newY);
-            }
+        if (!checkCollisions(newX, player.getY())) {
+            newX = Math.max(0, Math.min(newX, width - player.getWidth()));
+            player.setX(newX);
+        }
+        if (!checkCollisions(player.getX(), newY)) {
+            newY = Math.max(0, Math.min(newY, height - player.getHeight()));
+            player.setY(newY);
         }
 
-        // Aktualizuje pozici hráče
-        player.setX(newX);
-        player.setY(newY);
+    }
+
+    private boolean checkCollisions(int x, int y) {
+        Rectangle playerRect = new Rectangle(x, y, player.getWidth(), player.getHeight());
+        for (Wall wall : walls) {
+            if (!wall.isActive()) {
+                continue; // Skip inactive walls
+            }
+            Rectangle wallRect = wall.getRectangle();
+            if (playerRect.intersects(wallRect)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void spawnRocket() {
@@ -235,36 +243,30 @@ public class GameLogic extends JPanel implements Runnable {
 
             Point point = null;
             switch (randCorner) {
-
                 case 0:
                     point = pointToEnemy(player.x, player.y, 0, 0, 6);
                     bullets.add(new Bullet(0, 0, point.x, point.y, "Bullet.png"));
                     break;
-
-                case 1: // Pokud je vybrán roh 1
+                case 1:
                     point = pointToEnemy(player.x, player.y, 1080, 0, 6);
                     bullets.add(new Bullet(1080, 0, point.x, point.y, "Bullet.png"));
                     break;
-                case 2: // Pokud je vybrán roh 2
+                case 2:
                     point = pointToEnemy(player.x, player.y, 0, 720, 6);
                     bullets.add(new Bullet(0, 720, point.x, point.y, "Bullet.png"));
                     break;
-                case 3: // Pokud je vybrán roh 3
+                case 3:
                     point = pointToEnemy(player.x, player.y, 1080, 720, 6);
                     bullets.add(new Bullet(1080, 720, point.x, point.y, "Bullet.png"));
                     break;
-
             }
         }
     }
 
-    // Vypočítá bod směřující k nepřáteli
     public Point pointToEnemy(int enemyX, int enemyY, int coordX, int coordY, double speed) {
-        double angle = Math.atan2(enemyY - coordY, enemyX - coordX); // Vypočítá úhel
-
-        return new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle))); // Vrátí bod se souřadnicemi směrem k nepříteli
+        double angle = Math.atan2(enemyY - coordY, enemyX - coordX);
+        return new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle)));
     }
-
 
     public void spawnInterval() {
         startCount++;
@@ -274,7 +276,6 @@ public class GameLogic extends JPanel implements Runnable {
         }
     }
 
-
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
@@ -282,13 +283,10 @@ public class GameLogic extends JPanel implements Runnable {
 
     @Override
     public void run() {
-
         while (gameThread != null) {
-            currentTime = System.nanoTime(); // Získá aktuální čas
-
-            delta += (currentTime - lastTime) / drawInterval; // Přičte k deltě rozdíl mezi aktuálním a posledním časem vyděleným intervaly vykreslování
-            lastTime = currentTime; // Aktualizuje poslední čas
-
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            lastTime = currentTime;
             if (delta >= 1) {
                 update();
                 repaint();
@@ -297,12 +295,10 @@ public class GameLogic extends JPanel implements Runnable {
         }
     }
 
-
     public void resetGame() {
         gameState = 1;
         gameStarted = false;
         player = new Player(this, keyReader, 500, 500, "Player.gif", "PlayerHit.gif");
-        enemies.clear();
         walls.clear();
         bullets.clear();
         secondsPassed = 0;
