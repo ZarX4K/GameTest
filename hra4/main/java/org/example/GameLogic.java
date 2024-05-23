@@ -11,7 +11,7 @@ import java.util.Random;
 public class GameLogic extends JPanel implements Runnable {
     private final ArrayList<Enemy> enemies;
     private final ArrayList<Wall> walls;
-    private final ArrayList<Bullet> rockets;
+    private final ArrayList<Bullet> bullets;
     private Heartz heartz;
     private Heartz heartz2;
     private Heartz heartz3;
@@ -33,13 +33,13 @@ public class GameLogic extends JPanel implements Runnable {
     int startCount;
     int spawnRate = 27;
     Timer timer;
-    Player player = new Player(this, keyReader, 500, 500, "Player.gif");
+    Player player = new Player(this, keyReader, 500, 500, "Player.gif", "PlayerHit.gif");
 
 
     public GameLogic() {
         this.enemies = new ArrayList<>();
         this.walls = new ArrayList<>();
-        this.rockets = new ArrayList<>();
+        this.bullets = new ArrayList<>();
         backGround = new BackGround(this);
         startGamePic = new StartGamePic(this);
         endGamePic = new EndGamePic(this);
@@ -89,10 +89,11 @@ public class GameLogic extends JPanel implements Runnable {
                 g.drawImage(wall.getImage(),wall.getX(),wall.getY(),this);
  //                      }
             }
-            for (Bullet rocket : rockets) {
+            for (Bullet rocket : bullets) {
                 g.drawImage(rocket.getImage(), rocket.getCoord().x, rocket.getCoord().y, this);
             }
             g.setFont(customFont);
+            g.setColor(Color.WHITE);
             g.drawString("Time Alive: " + getSecondsPassed(), 960, 100);
             g.drawString("Health: " + player.getLives(), 970, 80);
             if (player.getLives() > 6) {
@@ -143,26 +144,19 @@ public class GameLogic extends JPanel implements Runnable {
         ArrayList<Bullet> rocketsToRemove = new ArrayList<>();
         changeGameState();
         controlledMove();
-        for (Bullet rocket : rockets) {
-            rocket.move();
-            if (player.isCollided(rocket.getRectangle()) && !player.dead) {
+        for (Bullet bullet : bullets) {
+            bullet.move();
+            if (player.isCollided(bullet.getRectangle()) && player.canBeHit()) {
                 player.hit();
-                player.dead = true;
-                rocketsToRemove.add(rocket);
-            }
-            if (player.dead) {
-                player.timeToAlive -= 2;
-            }
-            if (player.dead && player.timeToAlive < 0) {
-                player.dead = false;
-                player.timeToAlive = 1500;
+                rocketsToRemove.add(bullet);
             }
         }
-        rockets.removeAll(rocketsToRemove);
+        bullets.removeAll(rocketsToRemove);
         spawnInterval();
         if (player.getLives() <= 0) {
             gameState = 3;
         }
+        repaint(); // premaluje hrace
     }
 
     private void controlledMove() {
@@ -193,8 +187,7 @@ public class GameLogic extends JPanel implements Runnable {
 
         Rectangle newPlayerRectangle = new Rectangle(newX, newY, player.getWidth(), player.getHeight());
 
-        for
-        (Wall wall : walls) { // Pro každou zeď ve seznamu zdí
+        for (Wall wall : walls) { // Pro každou zeď ve seznamu zdí
             Rectangle wallRectangle = wall.getRectangle(); // Získá obdélník zdi
 
             // Kontroluje horizontální kolize
@@ -245,20 +238,20 @@ public class GameLogic extends JPanel implements Runnable {
 
                 case 0:
                     point = pointToEnemy(player.x, player.y, 0, 0, 6);
-                    rockets.add(new Bullet(0, 0, point.x, point.y, "Bullet.png"));
+                    bullets.add(new Bullet(0, 0, point.x, point.y, "Bullet.png"));
                     break;
 
                 case 1: // Pokud je vybrán roh 1
                     point = pointToEnemy(player.x, player.y, 1080, 0, 6);
-                    rockets.add(new Bullet(1080, 0, point.x, point.y, "Bullet.png"));
+                    bullets.add(new Bullet(1080, 0, point.x, point.y, "Bullet.png"));
                     break;
                 case 2: // Pokud je vybrán roh 2
                     point = pointToEnemy(player.x, player.y, 0, 720, 6);
-                    rockets.add(new Bullet(0, 720, point.x, point.y, "Bullet.png"));
+                    bullets.add(new Bullet(0, 720, point.x, point.y, "Bullet.png"));
                     break;
                 case 3: // Pokud je vybrán roh 3
                     point = pointToEnemy(player.x, player.y, 1080, 720, 6);
-                    rockets.add(new Bullet(1080, 720, point.x, point.y, "Bullet.png"));
+                    bullets.add(new Bullet(1080, 720, point.x, point.y, "Bullet.png"));
                     break;
 
             }
@@ -308,10 +301,10 @@ public class GameLogic extends JPanel implements Runnable {
     public void resetGame() {
         gameState = 1;
         gameStarted = false;
-        player = new Player(this, keyReader, 500, 500, "Player.gif");
+        player = new Player(this, keyReader, 500, 500, "Player.gif", "PlayerHit.gif");
         enemies.clear();
         walls.clear();
-        rockets.clear();
+        bullets.clear();
         secondsPassed = 0;
         startCount = 0;
         initialize();

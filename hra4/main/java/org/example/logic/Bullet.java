@@ -7,6 +7,7 @@ public class Bullet extends Entity {
     private int velocityX;
     private int velocityY;
 
+
     public Bullet(int x, int y, int velocityX, int velocityY, String url) {
         super(x, y, url);
         this.velocityX = velocityX;

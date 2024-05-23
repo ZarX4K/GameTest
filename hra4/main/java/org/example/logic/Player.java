@@ -5,11 +5,11 @@ import org.example.GameLogic;
 import javax.swing.*;
 import java.awt.*;
 
-public class Player { //extends Entity {
+public class Player {
     GameLogic gamePanel;
     KeyReader keyReader;
     public int x;
-    public int   y;
+    public int y;
     public boolean dead = false;
     public int timeToAlive = 2000;
     private int lives;
@@ -17,21 +17,40 @@ public class Player { //extends Entity {
     public int height = 64;
     public int speed = 6;
     public Image image;
+    public Image hitImage;
 
-    public Player(GameLogic  gamePanel, KeyReader keyReader, int x, int y, String url){
+    private long lastHitTime;
+    private final long hitDelay = 1000; // 1 second delay
+
+    public Player(GameLogic gamePanel, KeyReader keyReader, int x, int y, String url, String hitUrl) {
         this.gamePanel = gamePanel;
         this.keyReader = keyReader;
         this.x = x;
         this.y = y;
-        ImageIcon ii = new ImageIcon(getClass().getResource("/" + url));
-        this.image = ii.getImage();
-        this.lives = 10;
+        this.image = new ImageIcon(getClass().getResource("/" + url)).getImage();
+        this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage(); // Correctly load hit image
+        this.lives = 110;
     }
 
+    public void draw(Graphics g) {
+        if (canBeHit()) {
+            g.drawImage(image, x, y, width, height, null);
+        } else {
+            g.drawImage(hitImage, x, y, width, height, null);
+        }
+    }
 
+    public boolean canBeHit() {
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - lastHitTime) > hitDelay;
+    }
 
-    public void draw (Graphics g){
-        g.drawImage(image, x, y, width, height, null);
+    public void hit() {
+        long currentTime = System.currentTimeMillis();
+        if (canBeHit()) {
+            lives--;
+            lastHitTime = currentTime;
+        }
     }
 
     public int getX() {
@@ -54,35 +73,23 @@ public class Player { //extends Entity {
         return width;
     }
 
-
     public int getHeight() {
         return height;
     }
-
 
     public int getSpeed() {
         return speed;
     }
 
-
-
     public int getLives() {
         return lives;
     }
 
-
-
-    public void hit() {
-        lives--;
-
+    public Rectangle getRectangle() {
+        return new Rectangle(x, y, width, height);
     }
 
-    public Rectangle getRectangle(){
-        return new Rectangle(x,y,width, height);
-    }
-
-    public boolean isCollided (Rectangle otherObject) {
+    public boolean isCollided(Rectangle otherObject) {
         return getRectangle().intersects(otherObject);
     }
-
 }
