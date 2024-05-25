@@ -86,6 +86,7 @@ public class GameLogic extends JPanel implements Runnable {
         walls.add(new Wall(864, 321, "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(300, 521, "Rock.gif", "RockFlash.gif"));
     }
+
 private void wallActivation(){
      int activationTime = 60;
     for (Wall wall : walls) {
@@ -104,7 +105,7 @@ private void wallActivation(){
                 wall.draw(g);
             }
             for (Bullet bullet : bullets) {
-                g.drawImage(bullet.getImage(), bullet.getCoord().x, bullet.getCoord().y, this);
+                g.drawImage(bullet.getImage(), bullet.getCoord().x, bullet.getCoord().y,null);
             }
             g.setFont(customFont);
             g.setColor(Color.WHITE);
@@ -122,8 +123,8 @@ private void wallActivation(){
                 DarknessImage = new ImageIcon(getClass().getResource("/Darkness.png")).getImage();
                 darknessWidth = DarknessImage.getWidth(null);
                 darknessHeight = DarknessImage.getHeight(null);
-                int darknessX = player.getX() + player.getWidth() / 2 - darknessWidth / 2;
-                int darknessY = player.getY() + player.getHeight() / 2 - darknessHeight / 2;
+                int darknessX = player.getCoord().x + player.getWidth() / 2 - darknessWidth / 2;
+                int darknessY = player.getCoord().y + player.getHeight() / 2 - darknessHeight / 2;
                 g.drawImage(DarknessImage, darknessX, darknessY, this);
 
 
@@ -184,8 +185,8 @@ private void wallActivation(){
     }
 
     private void controlledMove() {
-        int newX = player.getX();
-        int newY = player.getY();
+        int newX = player.getCoord().x;
+        int newY = player.getCoord().y;
 
         if (keyReader.upPressed) newY -= player.getSpeed();
         if (keyReader.downPressed) newY += player.getSpeed();
@@ -213,13 +214,13 @@ private void wallActivation(){
             newY += player.getSpeed() - 10;
         }
 
-        if (!checkCollisions(newX, player.getY())) {
+        if (!checkCollisions(newX, player.getCoord().y)) {
             newX = Math.max(0, Math.min(newX, width - player.getWidth()));
-            player.setX(newX);
+            player.setCoord(new Coordinates(newX,player.getCoord().y));
         }
-        if (!checkCollisions(player.getX(), newY)) {
+        if (!checkCollisions(player.getCoord().x, newY)) {
             newY = Math.max(0, Math.min(newY, height - player.getHeight()));
-            player.setY(newY);
+            player.setCoord(new Coordinates(player.getCoord().x,newY));
         }
 
     }
@@ -248,19 +249,19 @@ private void wallActivation(){
             Point point = null;
             switch (randCorner) {
                 case 0:
-                    point = pointToEnemy(player.x, player.y, 0, 0, 6);
+                    point = pointToEnemy(player.getCoord().x, player.getCoord().y, 0, 0, 6);
                     bullets.add(new Bullet(0, 0, point.x, point.y, "Bullet.gif"));
                     break;
                 case 1:
-                    point = pointToEnemy(player.x, player.y, 1080, 0, 6);
+                    point = pointToEnemy(player.getCoord().x, player.getCoord().y, 1080, 0, 6);
                     bullets.add(new Bullet(1080, 0, point.x, point.y, "Bullet.gif"));
                     break;
                 case 2:
-                    point = pointToEnemy(player.x, player.y, 0, 720, 6);
+                    point = pointToEnemy(player.getCoord().x, player.getCoord().y, 0, 720, 6);
                     bullets.add(new Bullet(0, 720, point.x, point.y, "Bullet.gif"));
                     break;
                 case 3:
-                    point = pointToEnemy(player.x, player.y, 1080, 720, 6);
+                    point = pointToEnemy(player.getCoord().x, player.getCoord().y, 1080, 720, 6);
                     bullets.add(new Bullet(1080, 720, point.x, point.y, "Bullet.gif"));
                     break;
             }

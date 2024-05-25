@@ -13,6 +13,7 @@ public class Entity {
         this.coord = new Coordinates(x,y);
 
         ImageIcon ii = new ImageIcon(getClass().getResource("/" + url));
+
         this.image = ii.getImage();
 
         this.width = ii.getIconWidth();
@@ -27,6 +28,10 @@ public class Entity {
 
     public Coordinates getCoord() {
         return coord;
+    }
+
+    public void setCoord(Coordinates coord) {
+        this.coord = coord;
     }
 
     public Image getImage() {

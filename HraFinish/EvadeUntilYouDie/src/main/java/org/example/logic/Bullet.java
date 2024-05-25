@@ -3,7 +3,6 @@ package org.example.logic;
 import java.awt.*;
 
 public class Bullet extends Entity {
-
     private int velocityX;
     private int velocityY;
 

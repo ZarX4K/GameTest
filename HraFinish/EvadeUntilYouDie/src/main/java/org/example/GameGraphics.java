@@ -18,4 +18,5 @@ public class GameGraphics extends JFrame {
         setVisible(true);
     }
 
+
 }
