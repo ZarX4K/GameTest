@@ -76,18 +76,18 @@ public class GameLogic extends JPanel implements Runnable {
         heartz3 = new Heartz(980, 1, "Heartz3.gif");
     }
     private void createMaze() {
-        walls.add(new Wall(135, 51, "Rock.gif", "RockFlash.gif"));
-        walls.add(new Wall(600, 90, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(135, 51,  "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(600, 90,  "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(673, 523, "Rock.gif", "RockFlash.gif"));
-        walls.add(new Wall(843, 10, "Rock.gif", "RockFlash.gif"));
-        walls.add(new Wall(80, 423, "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(843, 10,  "Rock.gif", "RockFlash.gif"));
+        walls.add(new Wall(80, 423,  "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(984, 586, "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(380, 236, "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(864, 321, "Rock.gif", "RockFlash.gif"));
         walls.add(new Wall(300, 521, "Rock.gif", "RockFlash.gif"));
     }
 private void wallActivation(){
-     int activationTime = 3;
+     int activationTime = 60;
     for (Wall wall : walls) {
         wall.setActivationTime(activationTime);
         activationTime += 1;
@@ -117,7 +117,7 @@ private void wallActivation(){
             } else if (player.getLives() > 0) {
                 g.drawImage(heartz3.getImage(), heartz3.getX(), heartz3.getY(), null);
             }
-            if (secondsPassed > 120) {
+            if (secondsPassed > 119) {
 
                 DarknessImage = new ImageIcon(getClass().getResource("/Darkness.png")).getImage();
                 darknessWidth = DarknessImage.getWidth(null);

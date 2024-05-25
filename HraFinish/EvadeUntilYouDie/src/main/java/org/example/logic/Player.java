@@ -27,7 +27,7 @@ public class Player {
         this.y = y;
         this.image = new ImageIcon(getClass().getResource("/" + url)).getImage();
         this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage();
-        this.lives = 10;
+        this.lives = 99;
     }
 
     public void draw(Graphics g) {

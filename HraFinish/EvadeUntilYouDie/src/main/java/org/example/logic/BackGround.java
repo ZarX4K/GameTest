@@ -16,7 +16,7 @@ public class BackGround {
     int width = 1080;
     int height = 720;
     long startTime;
-    int SecondLevel = 60; // 1 minute in seconds
+    int SecondLevel = 60;
     int ThirdLevel = 120;
 
     public BackGround(GameLogic gamePanel) {
@@ -37,7 +37,7 @@ public class BackGround {
     }
 
     public void draw(Graphics g) {
-        int secondsPassed = gamePanel.getSecondsPassed(); // Get the seconds passed from GameLogic
+        int secondsPassed = gamePanel.getSecondsPassed();
 
         if (secondsPassed < SecondLevel) {
             g.drawImage(image, 0, 0, width, height, null);
