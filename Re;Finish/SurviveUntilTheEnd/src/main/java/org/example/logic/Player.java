@@ -22,7 +22,7 @@ public class Player extends Entity{
         this.gamePanel = gamePanel;
         this.keyReader = keyReader;
         this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage();
-        this.lives = 999;
+        this.lives = 10;
     }
 
     public void draw(Graphics g) {
