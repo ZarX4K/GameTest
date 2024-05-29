@@ -78,6 +78,22 @@ public class GameLogic implements Runnable {
                 }
             }
         });
+        gamePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_T && gameState == 2) {
+                    setSecondsPassed(getSecondsPassed()+20);
+                }
+            }
+        });
+        gamePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_H && gameState == 2) {
+                    player.setLives(player.getLives()+1);
+                }
+            }
+        });
 
     }
 
@@ -427,5 +443,9 @@ public class GameLogic implements Runnable {
 
     public Laser getLaserUpDown() {
         return laserUpDown;
+    }
+
+    public void setSecondsPassed(int secondsPassed) {
+        this.secondsPassed = secondsPassed;
     }
 }

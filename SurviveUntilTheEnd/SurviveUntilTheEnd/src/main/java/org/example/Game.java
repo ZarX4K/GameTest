@@ -10,7 +10,7 @@ public class Game {
     }
 
     public static class KeyReader implements KeyListener {
-        public boolean upPressed, downPressed, leftPressed, rightPressed, unstuckPressed, enterPressed;
+        public boolean upPressed, downPressed, leftPressed, rightPressed, unstuckPressed, enterPressed,timeAdd,healthAdd;
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -36,6 +36,12 @@ public class Game {
             if (e.getKeyCode() == KeyEvent.VK_R) {
                 unstuckPressed = true;
             }
+            if (e.getKeyCode() == KeyEvent.VK_T) {
+                timeAdd = true;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_H) {
+                healthAdd = true;
+            }
         }
 
         @Override
@@ -57,6 +63,12 @@ public class Game {
             }
             if (e.getKeyCode() == KeyEvent.VK_R) {
                 unstuckPressed = false;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_T) {
+                timeAdd = false;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_H) {
+                healthAdd = false;
             }
         }
     }

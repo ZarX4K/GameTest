@@ -19,7 +19,7 @@ public class Player extends Entity {
         super(x, y, url);
         this.gameLogic = gameLogic;
         this.hitImage = new ImageIcon(getClass().getResource("/" + hitUrl)).getImage();
-        this.lives = 10;
+        this.lives = 1000;
     }
 
     public void draw(Graphics g) {
