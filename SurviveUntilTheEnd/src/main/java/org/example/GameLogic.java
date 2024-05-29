@@ -56,8 +56,8 @@ public class GameLogic implements Runnable {
         heartz = new Heartz(980, 1, "Heartz.gif");
         heartzHalf = new Heartz(980, 1, "Heartz2.gif");
         heartzLast = new Heartz(980, 1, "Heartz3.gif");
-        laserSideWays = new Laser(0, 0, "LaserSideWays.png", 60, 720); // Changed dimensions for Sideways laser
-        laserUpDown = new Laser(0, 0, "LaserUpDown.png", 1080, 60); // Changed dimensions for UpDown laser
+        laserSideWays = new Laser(0, 0, "LaserSideWays.png", 60, 720);
+        laserUpDown = new Laser(0, 0, "LaserUpDown.png", 1080, 60);
         gamePanel.setFocusable(true);
         gamePanel.addKeyListener(keyReader);
         gamePanel.addMouseListener(new MouseAdapter() {
@@ -75,6 +75,22 @@ public class GameLogic implements Runnable {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && gameState == 3) {
                     resetGame();
+                }
+            }
+        });
+        gamePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_T && gameState == 2) {
+                    setSecondsPassed(getSecondsPassed()+20);
+                }
+            }
+        });
+        gamePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_H && gameState == 2) {
+                    player.setLives(player.getLives()+1);
                 }
             }
         });
@@ -199,10 +215,9 @@ public class GameLogic implements Runnable {
             gamePanel.repaint(); // premaluje obrazek intro
             return;
         }
-        spawnInterval();
+        shootInterval();
         controlledMove();
 
-        // Check collisions with bullets
         Iterator<Bullet> bulletIterator = bullets.iterator();
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
@@ -334,7 +349,7 @@ public class GameLogic implements Runnable {
         return new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle)));
     }
 
-    public void spawnInterval() {
+    public void shootInterval() {
         startCount++;
         if (startCount == spawnRate) {
             spawnRocket();
@@ -346,6 +361,7 @@ public class GameLogic implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
+
 
     @Override
     public void run() {
@@ -359,6 +375,7 @@ public class GameLogic implements Runnable {
             }
         }
     }
+
 
     public void resetGame() {
         gameState = 1;
@@ -427,5 +444,9 @@ public class GameLogic implements Runnable {
 
     public Laser getLaserUpDown() {
         return laserUpDown;
+    }
+
+    public void setSecondsPassed(int secondsPassed) {
+        this.secondsPassed = secondsPassed;
     }
 }

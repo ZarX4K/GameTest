@@ -12,7 +12,6 @@ public class Laser extends Entity {
 
     public Laser(int x, int y, String url, int width, int height) {
         super(x, y, url);
-        this.image = new ImageIcon(getClass().getResource("/" + url)).getImage();
         this.active = false;
         this.width = width;
         this.height = height;
